@@ -1,4 +1,4 @@
-class InvalidSession(Exception):
+class InvalidCredentials(Exception):
     """
     Exception class returned by Session instance when invalid credentials have
     been used in an attempt to create a session
@@ -46,13 +46,13 @@ class SessionManager:
         """
         raise_not_implemented_error(self.new_session.__name__)
     
-    def extend_session(self, session):
+    def extend_session(self, session_details):
         """
         Extends existing session
 
         Parameters
         ----------
-        session : dict
+        session_details : dict
         
         Returns
         -------
@@ -64,4 +64,18 @@ class SessionManager:
         InvalidSession
         """
         raise_not_implemented_error(self.extend_session.__name__)
+
+    def destroy_session(self, session_details):
+        """
+        Destroys existing session
+
+        Parameters
+        ----------
+        session_details : dict
+
+        Raises
+        ------
+        InvalidSession
+        """
+        raise_not_implemented_error(self.destroy_session.__name__)
 
