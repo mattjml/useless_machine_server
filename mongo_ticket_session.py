@@ -40,4 +40,15 @@ class MongoTicketSession(session.SessionManager):
         """
         from session import raise_not_implemented_error
         raise_not_implemented_error(self.destroy_session.__name__)
+ 
+    def authenticate_session(self, session_details):
+        """
+        Authenticates existing session. Goes to the configured mongodb and checks
+        if stored existing session exists and is within expiry time. Raises
+        session.InvalidSession if it isn't.
+
+        Overrides SessionManager.authenticate_session
+        """
+        from session import raise_not_implemented_error
+        raise_not_implemented_error(self.authenticate_session.__name__)
 

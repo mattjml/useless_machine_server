@@ -50,10 +50,6 @@ class StatefulTicketSession(session.SessionManager):
         Overrides SessionManager.extend_session
         """
         id = self.__class__._extract_session_id_from_session_obj(session_details) 
-        print(id)
-        print(type(id))
-        print([key for key in self.sessions.keys()])
-        print(self.sessions[id])
 
         try: 
             current_expiry = self.sessions[id]['expiry']
@@ -71,7 +67,7 @@ class StatefulTicketSession(session.SessionManager):
     
     def destroy_session(self, session_details):
         """
-        Destroys existing session. Checks local dictionary and and updates
+        Destroys existing session. Checks local dictionary and updates
         stored existing session with in-the-past expiry time if it exists. Raises
         session.InvalidSession if it does not.
 
@@ -83,6 +79,24 @@ class StatefulTicketSession(session.SessionManager):
             self.sessions[id]['expiry'] = (
                 datetime.now()
             )
+        except KeyError as error:
+            raise session.InvalidSession('Unknown session') from error
+
+    def authenticate_session(self, session_details):
+        """
+        Authenticates existing session. Checks local dictionary
+        if stored existing session exists and is within expiry time. Raises
+        session.InvalidSession if it isn't.
+
+        Overrides SessionManager.authenticate_session
+        """
+        id = self.__class__._extract_session_id_from_session_obj(session_details) 
+
+        try: 
+            current_expiry = self.sessions[id]['expiry']
+            now = datetime.now()
+            if now > current_expiry:
+                raise session.InvalidSession('Session has expired')
         except KeyError as error:
             raise session.InvalidSession('Unknown session') from error
 

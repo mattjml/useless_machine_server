@@ -78,4 +78,17 @@ class SessionManager:
         InvalidSession
         """
         raise_not_implemented_error(self.destroy_session.__name__)
+ 
+    def authenticate_session(self, session_details):
+        """
+        Authenticates session details
+
+        Parameters
+        ----------
+        session_details : dict
+
+        Raises
+        ------
+        InvalidSession
+        """
 
