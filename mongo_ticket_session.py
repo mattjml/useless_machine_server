@@ -1,8 +1,8 @@
 import session
 
-class MongoTicketSession(session.Session):
+class MongoTicketSession(session.SessionManager):
     """
-    Session manager that creates unauthenticated session tickets and stores the state
+    SessionManager that creates unauthenticated session tickets and stores the state
     of these in a mongodb instance. 
     """
     def __init__(self, config):
@@ -15,7 +15,7 @@ class MongoTicketSession(session.Session):
         session ticket *without any authentication*. Raises session.InvalidCredentials
         if it does not. 
 
-        Overrides session.new_session
+        Overrides SessionManager.new_session
         """
         raise_not_implemented_error(self.new_session.__name__)
     
@@ -25,7 +25,7 @@ class MongoTicketSession(session.Session):
         stored existing session with longer timestamp if it exists. Raises
         session.InvalidSession if it does not.
 
-        Overrides session.extend_session
+        Overrides SessionManager.extend_session
         """
         raise_not_implemented_error(self.extend_session.__name__)
 
