@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+
 import session
 
-class MongoTicketSession(session.SessionManager):
+class MongoTicketSessionManager(session.SessionManager):
     """
     SessionManager that creates unauthenticated session tickets and stores the state
     of these in a mongodb instance. 
@@ -23,7 +25,7 @@ class MongoTicketSession(session.SessionManager):
         """
         Extends existing session. Goes to the configured mongodb and updates
         stored existing session with longer expiry time if it exists. Raises
-        session.InvalidSession if it does not.
+        session.InvalidSessionError if it does not.
 
         Overrides SessionManager.extend_session
         """
@@ -34,7 +36,7 @@ class MongoTicketSession(session.SessionManager):
         """
         Destroys existing session. Goes to the configured mongodb and updates
         stored existing session with in-the-past expiry time if it exists. Raises
-        session.InvalidSession if it does not.
+        session.InvalidSessionError if it does not.
 
         Overrides SessionManager.extend_session
         """
@@ -45,7 +47,7 @@ class MongoTicketSession(session.SessionManager):
         """
         Authenticates existing session. Goes to the configured mongodb and checks
         if stored existing session exists and is within expiry time. Raises
-        session.InvalidSession if it isn't.
+        session.InvalidSessionError if it isn't.
 
         Overrides SessionManager.authenticate_session
         """
