@@ -58,8 +58,8 @@ class UserDoesntExistError(Exception):
 
 class GameState:
     """
-    Abstract implementation. Concrete implementations of this class are responsible for
-    managing and updating game state
+    Abstract implementation of game state and its control.
+    Concrete implementations of this class are responsible for managing and updating game state
     """
 
     def __init__(self, config):
