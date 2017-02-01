@@ -79,8 +79,11 @@ def action():
         result = game_state.user_action(req['session']['id'], req['user_action'])
     except InvalidSessionError:
         return create_json_error_response('cant take user action', status.HTTP_401_UNAUTHORIZED)
-    except InvalidUserActionError:
-        return create_json_error_response('invalid user action', status.HTTP_400_BAD_REQUEST)
+    except InvalidUserActionError as error:
+        return create_json_error_response(
+            'invalid user action ' + error.msg,
+            status.HTTP_400_BAD_REQUEST
+        )
     except KeyError:
         return create_json_error_response('invalid request', status.HTTP_400_BAD_REQUEST)
     except UserDoesntExistError:
