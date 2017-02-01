@@ -12,6 +12,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 import game_state
 import stateful_game_state
 
+
 #### Helper functions ####
 def create_gs(config):
     return stateful_game_state.StatefulGameState({})
@@ -24,6 +25,7 @@ def test_remove_user():
     id = gen_id()
     gs.add_user(id)
     gs.remove_user(id)
+
 
 #### Tests ####
 @raises(game_state.UserDoesntExistError)

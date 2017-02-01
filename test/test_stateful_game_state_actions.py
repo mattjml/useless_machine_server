@@ -27,26 +27,82 @@ def create_gs_and_add_user(config):
     id = add_user(gs)
     return gs, id
 
+def create_user_action(code):
+    return {
+        'api': {
+            'name': 'stateful',
+            'version': 1
+        },
+        'action': code
+    }
+
+def create_gs_user_and_action(config):
+    gs, id = create_gs_and_add_user({})
+    return gs, id, create_user_action({'code': 'CHECK_IF_ALERTED'})
+
 def validate_check_if_alerted_response(id, response, action, expected_alert_state):
     nose.tools.ok_(response['user_id'] == id)
-    nose.tools.ok_(response['user_action']['code'] == action['code'])
+    # Cheeky by-reference comparison
+    nose.tools.ok_(response['user_action']['action'] == action['action'])
     nose.tools.ok_(len(response['response'].keys()) == 1)
     nose.tools.ok_(response['response']['alerted'] == expected_alert_state)
+
 
 #### Tests ####
 @raises(game_state.UserDoesntExistError)
 def test_user_action_nonexistant_user():
     gs, id = create_gs_and_add_user({})
-    gs.user_action(gen_id(), {'code': 'CHECK_IF_ALERTED'})
+    gs.user_action(gen_id(), create_user_action({'code': 'CHECK_IF_ALERTED'}))
 
 @raises(game_state.InvalidUserActionError)
 def test_user_action_nonexistant_action():
     gs, id = create_gs_and_add_user({})
-    gs.user_action(id, {'code': 'CHECK_IF_ALERTIFIED'})
+    gs.user_action(id, create_user_action({'code': 'CHECK_IF_ALERTIFIED'}))
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_no_api_detais():
+    gs, id, action = create_gs_user_and_action({})
+    del action['api']
+    gs.user_action(id, action)
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_wrong_api_name():
+    gs, id, action = create_gs_user_and_action({})
+    action['api']['name'] = 'giraffe'
+    gs.user_action(id, action)
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_no_api_name():
+    gs, id, action = create_gs_user_and_action({})
+    del action['api']['name']
+    gs.user_action(id, action)
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_wrong_api_version():
+    gs, id, action = create_gs_user_and_action({})
+    action['api']['version'] = 2
+    gs.user_action(id, action)
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_no_api_version():
+    gs, id, action = create_gs_user_and_action({})
+    del action['api']['version']
+    gs.user_action(id, action)
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_no_action_details():
+    gs, id, action = create_gs_user_and_action({})
+    del action['action']
+    gs.user_action(id, action)
+
+@raises(game_state.InvalidUserActionError)
+def test_user_action_no_action_code():
+    gs, id, action = create_gs_user_and_action({})
+    del action['action']['code']
+    gs.user_action(id, action)
 
 def test_user_action_check_if_new_user_alerted():
-    gs, id = create_gs_and_add_user({})
-    action = {'code': 'CHECK_IF_ALERTED'}
+    gs, id, action = create_gs_user_and_action({})
 
     # Newly instantiated users shouldn't have alerts
     res = gs.user_action(id, action)
@@ -55,7 +111,7 @@ def test_user_action_check_if_new_user_alerted():
 def test_user_action_check_user_is_alerted():
     gs, id = create_gs_and_add_user({})
     other_id = add_user(gs)
-    action = {'code': 'CHECK_IF_ALERTED'}
+    action = create_user_action({'code': 'CHECK_IF_ALERTED'})
 
     # Insert an alert
     gs.find_state(other_id)['alert_state'] = True
@@ -79,7 +135,7 @@ def test_user_action_button_press():
     # TODO mock out random such that we don't have to do
     # TODO ... this crazy loop
     for i in range(1000):
-        gs.user_action(id, {'code': 'BUTTON_PRESS'})
+        gs.user_action(id, create_user_action({'code': 'BUTTON_PRESS'}))
         nose.tools.ok_(gs.find_state(id)['alert_state'] is False)
 
     # TODO this is a bad way to test this

@@ -8,6 +8,9 @@ from game_state import (
     GameState, InvalidUserActionError, UserAlreadyExistsError, UserDoesntExistError
 )
 
+API_NAME = 'stateful'
+API_VERSION = 1
+
 class StatefulGameState(GameState):
     """
     Locally stateful implementation of game_state.GameState.
@@ -42,10 +45,21 @@ class StatefulGameState(GameState):
         Overrides GameState.user_action
         """
         result = None
+        self.__class__.validate_user_action(user_action)
         user_id = self.__class__._convert_uuid(user_id)
-        if user_action['code'] == 'BUTTON_PRESS':
+        if user_action['api']['name'] != API_NAME:
+            raise InvalidUserActionError(
+                '{} is a different API name to the one offered'.format(user_action['api']['name'])
+            )
+        if user_action['api']['version'] != API_VERSION:
+            raise InvalidUserActionError(
+                '{} is a different API version to the one offered'.format(
+                    user_action['api']['version']
+                )
+            )
+        if user_action['action']['code'] == 'BUTTON_PRESS':
             result = self.handle_button_press(user_id, user_action)
-        elif user_action['code'] == 'CHECK_IF_ALERTED':
+        elif user_action['action']['code'] == 'CHECK_IF_ALERTED':
             result = self.handle_check_if_alerted(user_id, user_action)
         else:
             raise InvalidUserActionError('{} is not a valid action'.format(user_action['code']))

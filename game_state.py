@@ -3,11 +3,12 @@
 #### Imports ####
 
 from jsonschema import Draft4Validator
+from jsonschema.exceptions import ValidationError
 
 from helpers import raise_not_implemented_error
 
 #### Constants ####
-USER_ACTION_CODES = ['BUTTON_PRESS']
+USER_ACTION_CODES = ['BUTTON_PRESS', 'CHECK_IF_ALERTED']
 USER_ACTION = {
     'type': 'object',
     'properties': {
@@ -22,13 +23,10 @@ USER_ACTION = {
         'action': {
             'type': 'object',
             'properties': {
-                'code': {
-                    'type': 'string',
-                    'pattern': USER_ACTION_CODES[0] # TODO join all action codes
-                },
+                'code': {'enum': USER_ACTION_CODES},
                 'data': {'type': 'object'}
             },
-            'required': ['code', 'data']
+            'required': ['code']
         }
     },
     'required': ['api', 'action']
@@ -118,7 +116,10 @@ class GameState:
         On instance['api']:
             {'name': 'leg'}
         """
-        USER_ACTION_VALIDATOR.validate(user_action)
+        try:
+            USER_ACTION_VALIDATOR.validate(user_action)
+        except ValidationError as error:
+            raise InvalidUserActionError('user action does not meet the JSON schema') from error
 
     @staticmethod
     def create_user_button_press_response(user_id, user_action, success):
