@@ -43,9 +43,7 @@ class StatefulGameState(GameState):
         """
         result = None
         user_id = self.__class__._convert_uuid(user_id)
-        print(user_action)
         if user_action['code'] == 'BUTTON_PRESS':
-            print(user_action)
             result = self.handle_button_press(user_id, user_action)
         elif user_action['code'] == 'CHECK_IF_ALERTED':
             result = self.handle_check_if_alerted(user_id, user_action)
@@ -124,7 +122,9 @@ class StatefulGameState(GameState):
         state['alert_state'] = False
         other_users_state = [state for (id, state) in self.state.items() if id != user_id]
         for other_user_state in other_users_state:
-            other_user_state['alert_state'] = bool(random.getrandbits(1))
+            other_user_state['alert_state'] = (
+                other_user_state['alert_state'] or bool(random.getrandbits(1))
+            )
         return self.__class__.create_user_button_press_response(user_id, user_action, True)
 
     def handle_check_if_alerted(self, user_id, user_action):
@@ -142,5 +142,5 @@ class StatefulGameState(GameState):
         return self.__class__.create_user_check_if_alerted_response(
             user_id,
             user_action,
-            self.find_state(user_id)['alert_state']
+            self.find_state(user_id)['alert_state'] or False
         )
