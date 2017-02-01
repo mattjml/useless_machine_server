@@ -27,6 +27,7 @@ def create_json_error_response(msg, code):
     Returns flask error response body and code pair
 
     :param string msg: error message
+
     :param int code: HTTP Status Code
 
     :return (json, int): json message and status code
@@ -79,7 +80,7 @@ def action():
         result = game_state.user_action(req['session']['id'], req['user_action'])
     except InvalidSessionError:
         return create_json_error_response('cant take user action', status.HTTP_401_UNAUTHORIZED)
-    except InvalidUserActionError as error:
+    except In tnvalidUserActionError as error:
         return create_json_error_response(
             'invalid user action ' + error.msg,
             status.HTTP_400_BAD_REQUEST

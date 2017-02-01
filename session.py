@@ -27,53 +27,36 @@ class SessionManager:
     
     def new_session(self, credentials):
         """
-        Creates new session
+        Creates new session based on credentials
 
-        Parameters
-        ----------
-        credentials : dict
-        
-        Returns
-        -------
-        dict
-            Session details
+        :param dict credentials:
 
-        Raises
-        ------
-        InvalidCredentialsError
+        :return dict: session details
+
+        :raises InvalidCredentialsError:
         """
         raise_not_implemented_error(self.new_session.__name__)
     
     def extend_session(self, session_details):
         """
-        Extends existing session
+        Extends session expiry time
 
-        Parameters
-        ----------
-        session_details : dict
-        
-        Returns
-        -------
-        dict
-            Session details
+        :param dict session_details: As returned by new_session
 
-        Raises
-        ------
-        InvalidSessionError
+        :return dict: session_details
+
+        :raises InvalidSessionError:
         """
         raise_not_implemented_error(self.extend_session.__name__)
 
     def destroy_session(self, session_details):
         """
         Destroys existing session
+        :param dict session_details:  As returned by new_session
 
-        Parameters
-        ----------
-        session_details : dict
+        :return None:
 
-        Raises
-        ------
-        InvalidSessionError
+        :raises InvalidSessionError:
         """
         raise_not_implemented_error(self.destroy_session.__name__)
  
@@ -81,12 +64,11 @@ class SessionManager:
         """
         Authenticates session details
 
-        Parameters
-        ----------
-        session_details : dict
+        :param dict session_details: As returned by new_session
 
-        Raises
-        ------
-        InvalidSessionError
+        :return None:
+
+        :raises InvalidSessionError
         """
+        raise_not_implemented_error(self.authenticate_session.__name__)
 
