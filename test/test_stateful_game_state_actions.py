@@ -50,8 +50,22 @@ def test_add_user_string_uuid():
     gs = create_gs({})
     gs.add_user(str(uuid.uuid4()))
 
-def test_remove_user_str():
+def test_remove_user_string_uuid():
     gs = create_gs({})
     id = uuid.uuid4()
     gs.add_user(id)
     gs.remove_user(str(id))
+
+@raises(game_state.UserDoesntExistError)
+def test_remove_nonexistant_user():
+    gs = create_gs({})
+    gs.add_user(uuid.uuid4())
+    gs.remove_user(uuid.uuid4())
+
+@raises(game_state.UserDoesntExistError)
+def test_cleanup():
+    gs = create_gs({})
+    id = uuid.uuid4()
+    gs.add_user(id)
+    gs.clean_up()
+    gs.remove_user(id)
