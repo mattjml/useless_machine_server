@@ -8,7 +8,7 @@ from jsonschema.exceptions import ValidationError
 from helpers import raise_not_implemented_error
 
 #### Constants ####
-USER_ACTION_CODES = ['BUTTON_PRESS', 'CHECK_IF_ALERTED']
+USER_ACTION_CODES = ['BUTTON_PRESS', 'CHECK_IF_ALERTED', 'START', 'STOP']
 USER_ACTION = {
     'type': 'object',
     'properties': {
@@ -73,48 +73,6 @@ class GameState:
         :return None:
 
         :raises InvalidUserActionError:
-        >>>game_state.GameState.validate_user_action({
-        >>>    'api': {'name': 'leg', 'version': 1},
-        >>>    'action': {'code': 'BUTTON_PRESS', 'data': {}}
-        >>>})
-
-        >>>game_state.GameState.validate_user_action({
-        >>>    'api': {'name': 'leg', 'version': '1'},
-        >>>    'action': {'code': 'BUTTON_PRESS', 'data': {}}
-        >>>})
-        Traceback (most recent call last):
-          File "<stdin>", line 1, in <module>
-          File "/root/game_state.py", line 59, in validate_user_action
-            USER_ACTION_VALIDATOR.validate(user_action)
-          File "/usr/local/lib/python3.6/site-packages/jsonschema/validators.py", line 123, in validate
-            raise error
-        jsonschema.exceptions.ValidationError: '1' is not of type 'integer'
-
-        Failed validating 'type' in schema['properties']['api']['properties']['version']:
-            {'type': 'integer'}
-
-        On instance['api']['version']:
-            '1'
-        >>>game_state.GameState.validate_user_action({
-        >>>    'api': {'name': 'leg'},
-        >>>    'action': {'code': 'BUTTON_PRESS', 'data': {}}
-        >>>})
-        Traceback (most recent call last):
-          File "<stdin>", line 1, in <module>
-          File "/root/game_state.py", line 59, in validate_user_action
-            USER_ACTION_VALIDATOR.validate(user_action)
-          File "/usr/local/lib/python3.6/site-packages/jsonschema/validators.py", line 123, in validate
-            raise error
-        jsonschema.exceptions.ValidationError: 'version' is a required property
-
-        Failed validating 'required' in schema['properties']['api']:
-            {'properties': {'name': {'type': 'string'},
-                            'version': {'type': 'integer'}},
-             'required': ['name', 'version'],
-             'type': 'object'}
-
-        On instance['api']:
-            {'name': 'leg'}
         """
         try:
             USER_ACTION_VALIDATOR.validate(user_action)
@@ -154,6 +112,24 @@ class GameState:
             'user_action': user_action,
             'response': {
                 'alerted': alerted
+            }
+        }
+
+    @staticmethod
+    def create_user_start_stop_response(user_id, user_action, success):
+        """
+        Creates dictionary ready to be jsonify'd that contains response to 'START' or 'STOP' user
+        actions.
+        :param uuid.UUID user_id: user UUID
+        :param dict user_action:
+        :param bool success:
+        :return dict:
+        """
+        return {
+            'user_id': user_id,
+            'user_action': user_action,
+            'response': {
+                'success': success
             }
         }
     

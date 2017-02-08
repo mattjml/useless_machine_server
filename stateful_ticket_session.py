@@ -102,3 +102,18 @@ class StatefulTicketSessionManager(session.SessionManager):
         except KeyError as error:
             raise session.InvalidSessionError('Unknown session') from error
 
+    def check_expired_sessions(self):
+        """
+        Returns all sessions that have expired since the last call to
+        check_expired_sessions. Removes them from the local session list
+
+        Overrides SessionManager.check_expired_sessions
+        """
+        now = datetime.now()
+        expired = {
+            id: session for (id, session) in self.sessions.items() if session['expiry'] < now
+        }
+        for id in expired.keys():
+            del self.sessions[id]
+        return expired
+

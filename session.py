@@ -72,3 +72,12 @@ class SessionManager:
         """
         raise_not_implemented_error(self.authenticate_session.__name__)
 
+    def set_expired_sessions_handler(self, func):
+        """
+        Returns all sessions that have expired since the last call to
+        check_expired_sessions
+
+        :return (dict, dict,...): Tuple containing session details dicts
+        """
+        raise_not_implemented_error(self.check_expired_sessions.__name__)
+

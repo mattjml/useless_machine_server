@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import threading
+
 from flask import Flask, jsonify, request
 from flask_api import status
 
@@ -13,11 +15,11 @@ app = Flask(__name__)
 # TODO dependency injection
 session_config = {
     'expiry_timeout_s': 100,
-    'expiry_sliding_window_s': 20
+    'expiry_sliding_window_s': 60
 }
 from stateful_ticket_session import StatefulTicketSessionManager as SessionManager
 session_manager = SessionManager(session_config)
-game_config = {}
+game_config = {'alert_chance_of_multiply':0.2}
 from stateful_game_state import StatefulGameState as GameState
 game_state = GameState(game_config)
 
@@ -34,11 +36,19 @@ def create_json_error_response(msg, code):
     """
     return jsonify({'msg': msg}), code
 
+
 def parse_json(req):
     return req.get_json(force=True)
 
+
+def check_expired_sessions():
+    expired_sessions = session_manager.check_expired_sessions()
+    for id in expired_sessions.keys():
+        game_state.remove_user(id)
+
 @app.route('/login', methods=['POST'])
 def login():
+    check_expired_sessions()
     result = None
     try:
         credentials = parse_json(request)
@@ -50,6 +60,7 @@ def login():
 
 @app.route('/session', methods=['POST'])
 def session():
+    check_expired_sessions()
     result = None
     try:
         session_details = parse_json(request)
@@ -60,6 +71,7 @@ def session():
 
 @app.route('/signout', methods=['POST'])
 def signout():
+    check_expired_sessions()
     try:
         session_details = parse_json(request)
         session_manager.destroy_session(session_details)
@@ -72,6 +84,7 @@ def signout():
 
 @app.route('/action', methods=['POST'])
 def action():
+    check_expired_sessions()
     result = None
     try:
         req = parse_json(request)
@@ -80,7 +93,7 @@ def action():
         result = game_state.user_action(req['session']['id'], req['user_action'])
     except InvalidSessionError:
         return create_json_error_response('cant take user action', status.HTTP_401_UNAUTHORIZED)
-    except In tnvalidUserActionError as error:
+    except InvalidUserActionError as error:
         return create_json_error_response(
             'invalid user action ' + error.msg,
             status.HTTP_400_BAD_REQUEST
